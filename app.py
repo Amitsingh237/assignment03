@@ -1,9 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect
 import mysql.connector
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     conn = mysql.connector.connect(
         host="db",
@@ -17,17 +17,42 @@ def home():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(50)
+            name VARCHAR(50),
+            email VARCHAR(50),
+            course VARCHAR(50)
         )
     """)
 
-    cursor.execute("INSERT INTO users (name) VALUES ('Hello User')")
-    conn.commit()
+    if request.method == 'POST':
+        name = request.form['username']
+        email = request.form['email']
+        course = request.form['course']
+
+        cursor.execute(
+            "INSERT INTO users (name, email, course) VALUES (%s, %s, %s)",
+            (name, email, course)
+        )
+        conn.commit()
 
     cursor.execute("SELECT * FROM users")
     data = cursor.fetchall()
 
-    return f"Database Connected Successfully! Data: {data}"
+    return render_template('index.html', data=data)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    conn = mysql.connector.connect(
+        host="db",
+        user="root",
+        password="root",
+        database="testdb"
+    )
+
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id=%s", (id,))
+    conn.commit()
+
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

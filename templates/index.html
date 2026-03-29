@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+<body>
+    <h2>Student Registration Form</h2>
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Enter Name"><br><br>
+        <input type="email" name="email" placeholder="Enter Email"><br><br>
+        <input type="text" name="course" placeholder="Enter Course"><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h3>Stored Records:</h3>
+
+    {% for row in data %}
+        <p>
+            Name: {{ row[1] }} |
+            Email: {{ row[2] }} |
+            Course: {{ row[3] }}
+            <a href="/delete/{{ row[0] }}">Delete</a>
+        </p>
+    {% endfor %}
+</body>
+</html>
